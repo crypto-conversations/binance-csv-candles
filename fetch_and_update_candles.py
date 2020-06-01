@@ -12,7 +12,15 @@ import time
 import json
 import pathlib
 
-pathlib.Path('./data/binance').mkdir(parents=True, exist_ok=True)
+import argparse
+parser = argparse.ArgumentParser(description='Fetch some binance candles 🍹🕯.')
+parser.add_argument('--timeframe', nargs=1, required=True, help='specify timeframe: 1h, 1d, ...')
+args = parser.parse_args()
+timeframe = args.timeframe[0]
+
+filepath = f'./data/binance/{timeframe}'
+# create dir if not exists
+pathlib.Path(filepath).mkdir(parents=True, exist_ok=True)
 
 binance = ccxt.binance()
 
@@ -25,6 +33,7 @@ def human_time(t):
 print('now:', human_time(now()))
 
 def market_loop(ticker, filename):
+  print('market loop ↫', ticker, filename)
   # binance was created in 2017, so it should do
   start_date = datetime(year=2015, month=1, day=1, hour=0).timestamp() * 1000
 
@@ -37,31 +46,25 @@ def market_loop(ticker, filename):
     start_date = df_old['date'].iat[-1] + (3600 * 1000) # next candle open time
     print(ticker, len(df_old), '🕯, last open candle is at', human_time(df_old['date'].iat[-1]), '👉 next start_date', human_time((start_date)))
   else:
-    print(ticker, '👉 next start_date', human_time((start_date)))
+    print(ticker, '🚫 404 file not found 👉 next start_date', human_time((start_date)))
 
 
   # Run until now
   while start_date < now():
-
       # Fetch 500 hours of OHLCV data
-      data = binance.fetch_ohlcv(
-          ticker,
-          '1h',
-          limit=500,
-          since=int(start_date)
-      )
+      data = binance.fetch_ohlcv(ticker, timeframe, limit=500, since=int(start_date))
+
+      print('✅', human_time(start_date), f'({len(data)})')
+
+      if not len(data):
+        break;
 
       # Add results to master list
       df.extend(data)
-
       # Determine the last hour of OHLCV data pulled
       last_hour_pulled = data[-1][0]
-
-      print('✅ %2.f' % (100 * ((now() - start_date) / (1000 * 3600 * 24))))
-
       # Increment last hour pulled by an hour for our next set of 500 hourly OHLCV data
       start_date = last_hour_pulled + (3600 * 1000)
-
       # Pause to prevent reaching an API limit
       time.sleep(.1)
 
@@ -82,5 +85,5 @@ print(len(market_ids), '🚀')
 #print(json.dumps(markets['ETH/BTC'], indent=4))
 
 for ticker in market_ids:
-  filename = f"data/binance/{ticker.replace('/', '-')}.csv"
+  filename = f"{filepath}/{ticker.replace('/', '-')}.csv"
   market_loop(ticker=ticker, filename=filename)

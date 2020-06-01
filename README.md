@@ -1,13 +1,14 @@
 # binance-csv-candles
 
-Fetch Binance BTC, ETH and USDT market data and create/update hourly candles `csv` files.
-Files are stored in `./data/binance`.
+Fetch Binance BTC, ETH and USDT market data and create/update `csv` candle files.
+Files are stored in `./data/binance/{timeframe}`. Timeframe can be anything like `1d`, `1h`, etc.
 
 ## Usage
 
-The first time and when you want to update the files, just run it like this:
-```python
-python get_hourly_all.py
+The first time and then every time you want to update the data in your `csv` files, just run it like this:
+
+```bash
+$ python fetch_and_update_candles.py --timeframe 1d
 ```
 ## Manual
 
@@ -19,10 +20,12 @@ Each `csv` file contains 5 columns:
 * close,
 * volume
 
-There are 350+ pairs (files) which amount to 500+ MB of data, that is why the first run will take some time.
+## Results
+
+Hourly timeframe example (`1h`): there are 350+ pairs (files) which amount to 500+ MB of data for `1h` and 15MB for `1d`, that is why the first run will take some time.
 
 ```bash
-$ ls data/binance/
+$ ls data/binance/1h
 ADA-BTC.csv       BTG-BTC.csv       ENJ-BTC.csv       IOTA-BTC.csv      NAS-BTC.csv       RDN-BTC.csv       VET-BTC.csv
 ADA-ETH.csv       BTS-BTC.csv       ENJ-ETH.csv       IOTA-ETH.csv      NAS-ETH.csv       REN-BTC.csv       VET-ETH.csv
 ADA-USDT.csv      BTS-USDT.csv      ENJ-USDT.csv      IOTA-USDT.csv     NAV-BTC.csv       REN-USDT.csv      VET-USDT.csv

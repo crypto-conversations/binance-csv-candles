@@ -1,1 +1,1 @@
-data/binance/*.csv
+data/binance/**/*.csv
