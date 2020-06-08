@@ -57,7 +57,7 @@ def market_loop(ticker, filename):
       print('✅', human_time(start_date), f'({len(data)})')
 
       if not len(data):
-        break;
+        break
 
       # Add results to master list
       df.extend(data)
